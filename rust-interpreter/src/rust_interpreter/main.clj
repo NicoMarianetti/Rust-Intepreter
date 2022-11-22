@@ -1922,8 +1922,61 @@
 ; user=> (palabra-reservada? 13)
 ; false
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn palabra-reservada?
-
+(defn palabra-reservada? [elemento]
+  (or
+    (= elemento 'as)
+    (= elemento 'async)
+    (= elemento 'await)
+    (= elemento 'break)
+    (= elemento 'const)
+    (= elemento 'continue)
+    (= elemento 'crate)
+    (= elemento 'dyn)
+    (= elemento 'else)
+    (= elemento 'enum)
+    (= elemento 'extern)
+    (= elemento 'false)
+    (= elemento 'fn)
+    (= elemento 'for)
+    (= elemento 'if)
+    (= elemento 'impl)
+    (= elemento 'in)
+    (= elemento 'let)
+    (= elemento 'loop)
+    (= elemento 'match)
+    (= elemento 'mod)
+    (= elemento 'move)
+    (= elemento 'mut)
+    (= elemento 'pub)
+    (= elemento 'ref)
+    (= elemento 'return)
+    (= elemento 'self)
+    (= elemento 'Self)
+    (= elemento 'static)
+    (= elemento 'struct)
+    (= elemento 'super)
+    (= elemento 'trait)
+    (= elemento 'true)
+    (= elemento 'type)
+    (= elemento 'union)
+    (= elemento 'unsafe)
+    (= elemento 'use)
+    (= elemento 'where)
+    (= elemento 'while)
+    (= elemento 'abstract)
+    (= elemento 'become)
+    (= elemento 'box)
+    (= elemento 'do)
+    (= elemento 'final)
+    (= elemento 'macro)
+    (= elemento 'override)
+    (= elemento 'priv)
+    (= elemento 'try)
+    (= elemento 'typeof)
+    (= elemento 'unsized)
+    (= elemento 'virtual)
+    (= elemento 'yield)
+  )
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1960,9 +2013,14 @@
 ; 0 nil
 ; nil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn dump
+(defn toStringFormatDump [inst]
+  (let [number (first inst), intruction (second inst)]
+    (str number " " intruction)))
 
-)
+(defn dump [instrucciones]
+  (cond
+    (nil? instrucciones) (println "0 nil")
+    :else (first (map #(println (toStringFormatDump %)) (map-indexed list instrucciones)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; YA-DECLARADO-LOCALMENTE?: Recibe un identificador y un contexto (un vector formado por dos subvectores: el primero
@@ -1980,9 +2038,16 @@
 ; user=> (ya-declarado-localmente? 'Write [[0 2] [['io ['lib '()] 0] ['Write ['lib '()] 0] ['entero_a_hexa ['fn [(list ['n (symbol ":") 'i64]) 'String]] 2]]])
 ; false
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn ya-declarado-localmente?
+(defn obtenerIdentificadorEnTernaEnumerada [terna-enumerada]
+  (let [indice (first terna-enumerada),
+        terna (second terna-enumerada)]
+    (vector indice (first terna))))
 
-)
+(defn ya-declarado-localmente? [identificador contexto]
+  (let [ternas-enumeradas (map-indexed list (second contexto)),
+        scope (last (first contexto)),
+        identificadores-enumerados (map obtenerIdentificadorEnTernaEnumerada ternas-enumeradas)]
+    (> (count (filter #(= (second %) identificador) (filter #(>= (first %) scope) identificadores-enumerados))) 0)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; CARGAR-CONST-EN-TABLA: Recibe un ambiente 
