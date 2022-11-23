@@ -130,6 +130,8 @@
 
 ;; (deftest cargar-const-en-tabla-test
 ;;   (testing "Prueba de la funcion: cargar-const-en-tabla"
-;;     ()  
+;;     (is (= 
+;;       '(fn main ( ) { println! ( "{}" , TRES ) }) [use std :: io ; const TRES : i64 = 3] 8 [[0] [[io [lib ()] 0]]] 0 [[CAL 0] HLT] []]
+;;       (cargar-const-en-tabla [(symbol ";") (list 'fn 'main (symbol "(") (symbol ")") (symbol "{") 'println! (symbol "(") "{}" (symbol ",") 'TRES (symbol ")") (symbol "}")) ['use 'std (symbol "::") 'io (symbol ";") 'const 'TRES (symbol ":") 'i64 (symbol "=") 3] 8 [[0] [['io ['lib '()] 0]]] 0 [['CAL 0] 'HLT] []])))  
 ;;   )  
 ;; )

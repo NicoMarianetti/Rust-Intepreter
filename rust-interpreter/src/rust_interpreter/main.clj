@@ -2052,8 +2052,15 @@
 ; [; (fn main ( ) { println! ( "{}" , TRES ) }) [use std :: io ; const TRES : i64 = 3] :sin-errores [[0] [[io [lib ()] 0] [TRES [const i64] 3]]] 0 [[CAL 0] HLT] []]
 ;                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn cargar-const-en-tabla
-
+(defn cargar-const-en-tabla [amb]
+  (cond
+    (not= (estado amb) :sin-errores) amb
+    :else (let [const-declaracion (take-last 6 (simb-ya-parseados amb)),
+                const (first const-declaracion),
+                identificador (second const-declaracion),
+                tipo (second (drop 2 const-declaracion)),
+                valor (last const-declaracion),]
+            [(simb-actual amb) (simb-no-parseados-aun amb) (simb-ya-parseados amb) (estado amb) [(first (contexto amb)) (conj (second (contexto amb)) [identificador [const tipo] valor])] (prox-var amb) (bytecode amb) (mapa-regs-de-act amb)]))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2120,6 +2127,8 @@
 (defn generar-ref
 
 )
+
+(defn test [structure])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; FIXUP: Recibe un ambiente y la ubicacion de un JMP ? a corregir en el vector de bytecode. Si el estado no es
