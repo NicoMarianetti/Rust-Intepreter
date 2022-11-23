@@ -2075,9 +2075,11 @@
 ; [{ (let x : i64 = 10 ; println! ( "{}" , x ) }) [fn main ( )] :sin-errores [[0 1] [[main [fn [() ()]] 2]]] 0 [[CAL 2] HLT] []]
 ;                                                               ^^^^^^^^^^^^     ^  ^^^^^^^^^^^^^^^^^^^^^^^
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn inicializar-contexto-local
-
-)
+(defn inicializar-contexto-local [amb]
+  (cond
+    (not= (estado amb) :sin-errores) amb
+    :else (let [tamanio (count (second (contexto amb)))]
+            [(simb-actual amb) (simb-no-parseados-aun amb) (simb-ya-parseados amb) (estado amb) [(conj (first (contexto amb)) tamanio) (second (contexto amb))] (prox-var amb) (bytecode amb) (mapa-regs-de-act amb)])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; RESTAURAR-CONTEXTO-ANTERIOR: Recibe un ambiente y, si su estado no es :sin-errores, lo devuelve intacto.
@@ -2091,9 +2093,11 @@
 ; [EOF () [fn main ( ) { let x : i64 = 10 ; let y : i64 = 20 ; println! ( "{}" , x + y ) }] :sin-errores [[0] [[main [fn [() ()]] 2]]] 2 [[CAL 2] HLT [PUSHFI 10] [POP 0] [PUSHFI 20] [POP 1] [PUSHFI "{}"] [PUSHFM 0] [PUSHFM 1] ADD [PUSHFI 2] OUT NL] [[2 [i64 nil] [i64 nil]]]]
 ;                                                                                           ^^^^^^^^^^^^  ^^^ ^^^^^^^^^^^^^^^^^^^^^^^
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn restaurar-contexto-anterior
-
-)
+(defn restaurar-contexto-anterior [amb]
+  (cond
+    (not= (estado amb) :sin-errores) amb
+    :else (let [ultimo-contexto (last (first (contexto amb)))]
+            [(simb-actual amb) (simb-no-parseados-aun amb) (simb-ya-parseados amb) (estado amb) [(pop (first (contexto amb))) (vec (take ultimo-contexto (second (contexto amb))))] (prox-var amb) (bytecode amb) (mapa-regs-de-act amb)])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BUSCAR-TIPO-DE-RETORNO: Recibe un ambiente y la direccion de una funcion a ser buscada en el segundo subvector del
