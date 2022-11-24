@@ -191,3 +191,20 @@
     (is (= 0.5 (pasar-a-float 2/4)))
   )  
 )
+
+(deftest compatibles?-test
+  (testing "Prueba de la funcion: compatibles?"
+    (is (= true (compatibles? 'i64 5)))
+    (is (= false (compatibles? 'i64 5.0)))
+    (is (= true (compatibles? 'i64 [5.0])))
+    (is (= true (compatibles? 'f64 5.0)))
+    (is (= true (compatibles? 'String "Hola")))
+    (is (= true (compatibles? 'bool true)))
+    (is (= false (compatibles? 'bool 1)))
+    (is (= true (compatibles? 'usize 1)))
+    (is (= false (compatibles? 'usize -1)))
+    (is (= true (compatibles? 'char \a)))
+    (is (= false (compatibles? 'char 'a)))
+    (is (= true (compatibles? 'char ['a])))
+  )  
+)

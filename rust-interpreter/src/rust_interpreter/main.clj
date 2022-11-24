@@ -2257,8 +2257,17 @@
 ; user=> (compatibles? 'char ['a])
 ; true
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn compatibles?
-
+(defn compatibles? [type value]
+  (cond
+    (vector? value) true  
+    (and (boolean? value) (= type 'bool)) true
+    (and (integer? value) (or (= type 'i64))) true
+    (and (integer? value) (= type 'usize) (>= value 0)) true
+    (and (float? value) (= type 'f64)) true
+    (and (string? value) (= type 'String)) true
+    (and (char? value) (= type 'char)) true
+    :else false
+  )
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
