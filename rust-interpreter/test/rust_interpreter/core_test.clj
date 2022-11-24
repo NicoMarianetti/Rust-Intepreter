@@ -208,3 +208,10 @@
     (is (= true (compatibles? 'char ['a])))
   )  
 )
+
+(deftest cargar-en-ult-reg-test
+  (testing "Prueba de la funcion: cargar-en-ult-reg"
+    (is (= '[[[String "2"] [i64 6] [i64 2] [i64 3] [i64 0]] [[i64 nil] [i64 0]]] (cargar-en-ult-reg [[['String "2"] ['i64 6] ['i64 2] ['i64 3] ['i64 0]] [['i64 nil] ['i64 nil]]] 1 'i64 0)))  
+    (is (= '[[[String "2"] [i64 6] [i64 2] [i64 3] [i64 0]] [[f64 3] [i64 0]]] (cargar-en-ult-reg [[['String "2"] ['i64 6] ['i64 2] ['i64 3] ['i64 0]] [['i64 nil] ['i64 0]]] 0 'f64 3)))
+  )  
+)
