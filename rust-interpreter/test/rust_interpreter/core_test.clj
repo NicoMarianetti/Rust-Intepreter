@@ -165,3 +165,16 @@
     (is (= 0.5 (dividir 1 2.0)))
   )  
 )
+
+(deftest pasar-a-int-test
+  (testing "Prueba de la funcion: pasar-a-int"
+    (is (= 10 (pasar-a-int 10)))
+    (is (= 10 (pasar-a-int "10")))
+    (is (= 10 (pasar-a-int 10.0)))
+    (is (= 10 (pasar-a-int 10.8)))
+    (is (= [10.0] (pasar-a-int [10.0])))
+    (is (= 'a (pasar-a-int 'a)))
+    (is (= \a (pasar-a-int \a)))
+    (is (= 0 (pasar-a-int 2/3)))
+  )  
+)

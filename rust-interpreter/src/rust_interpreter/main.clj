@@ -2275,8 +2275,13 @@
 ; user=> (pasar-a-int [10.0])
 ; [10.0]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn pasar-a-int
-
+(defn pasar-a-int [number]
+  (cond
+    (float? number) (int number)
+    (string? number) (if (nil? (re-find #"\." number)) (Integer/parseInt number) (int (Float/parseFloat number)))
+    (rational? number) (int number)
+    :else number 
+  )
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
