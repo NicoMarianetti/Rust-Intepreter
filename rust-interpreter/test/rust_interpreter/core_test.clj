@@ -175,6 +175,19 @@
     (is (= [10.0] (pasar-a-int [10.0])))
     (is (= 'a (pasar-a-int 'a)))
     (is (= \a (pasar-a-int \a)))
-    (is (= 0 (pasar-a-int 2/3)))
+    (is (= 0 (pasar-a-int 2/4)))
+  )  
+)
+
+(deftest pasar-a-float-test
+  (testing "Prueba de la funcion: pasar-a-float"
+    (is (= 10.0 (pasar-a-float 10)))
+    (is (= 10.0 (pasar-a-float "10")))
+    (is (= 10.0 (pasar-a-float 10.0)))
+    (is (= 10.8 (pasar-a-float 10.8)))
+    (is (= [10.0] (pasar-a-float [10.0])))
+    (is (= 'a (pasar-a-float 'a)))
+    (is (= \a (pasar-a-float \a)))
+    (is (= 0.5 (pasar-a-float 2/4)))
   )  
 )
