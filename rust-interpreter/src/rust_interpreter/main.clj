@@ -126,6 +126,12 @@
 (declare generar-format!)
 (declare interpretar)
 
+(defn spy
+
+  ([x] (do (prn x) x))
+
+  ([msg x] (do (print msg) (print ": ") (prn x) x)))
+
 (defn driver-loop
    ([]
       (prn)
@@ -2167,10 +2173,43 @@
 ; user=> (convertir-formato-impresion '("Las raices cuadradas de {} son +{:.8} y -{:.8}" 4.0 1.999999999985448 1.999999999985448))
 ; ("Las raices cuadradas de %.0f son +%.8f y -%.8f" 4.0 1.999999999985448 1.999999999985448)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn convertir-formato-impresion
+(defn get-float-precision [string index result]
+  (cond
+    (= (nth string index) \}) result
+    :else (recur string (inc index) (inc result))))
 
-)
+(defn _convertir-formato-impresion [original-string current-char parsed-string index-argument args]
+  (cond
+    (<= (count original-string) current-char) (apply str parsed-string)
+    (= (dec (count original-string)) current-char) (apply str (conj parsed-string (nth original-string current-char)))
+    :else (let [char (nth original-string current-char),
+                next-char (nth original-string (inc current-char))]
+            (cond ; ToDo: Give error if a } char is reached, the previous one wasn't a {} and the next one isn't }
+              (and (= char \{) (= next-char \}))
+              (let [format (cond
+                             (integer? (nth args index-argument)) "%d"
+                             (float? (nth args index-argument)) "%.0f"
+                             :else "%s")]
+                (recur original-string (inc (inc current-char)) (conj parsed-string format) (inc index-argument) args))
 
+              (and (= char \{) (= next-char \{)) ; Escape the { char
+              (recur original-string (inc (inc current-char)) (conj parsed-string char) index-argument args)
+              (and (= char \}) (= next-char \})) ; Escape the } char
+              (recur original-string (inc (inc current-char)) (conj parsed-string char) index-argument args)
+              (and (= char \{) (= next-char \:))
+              (let [first-digit (inc (inc (inc current-char)))
+                    precision (get-float-precision original-string first-digit 0),
+                    format (str "%." (subs original-string first-digit (+ first-digit precision)) "f")]
+                (recur original-string (+ current-char 4 precision) (conj parsed-string format) (inc index-argument) args))
+              :else (recur original-string (inc current-char) (conj parsed-string char) index-argument args)))))
+
+(defn convertir-formato-impresion [args-print]
+  (let [original-string (first args-print)
+        current-char 0
+        parsed-string []
+        index-argument 0]
+    (conj (rest args-print) (_convertir-formato-impresion original-string current-char parsed-string index-argument (rest args-print)))))
+  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; DIVIDIR: Recibe dos numeros y devuelve su cociente, manteniendo su tipo.
 ; Por ejemplo:
