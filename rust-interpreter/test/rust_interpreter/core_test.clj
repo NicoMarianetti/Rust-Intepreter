@@ -143,3 +143,25 @@
     (is (nil? (buscar-tipo-de-retorno [(symbol ";") (list 'println! (symbol "(") "La suma de 5 mas 7 es {}" (symbol ",") 'suma (symbol "(") 5 (symbol ",") 7 (symbol ")") (symbol ")") (symbol ";") (symbol "}")) ['fn 'suma (symbol "(") 'x (symbol ":") 'i64 (symbol ",") 'y (symbol ":") 'i64 (symbol ")") (symbol "->") 'i64 (symbol "{") 'x '+ 'y (symbol "}") 'fn 'main (symbol "(") (symbol ")") (symbol "{") 'suma (symbol "(") 5 (symbol ",") 7 (symbol ")")] :sin-errores [[0 2] [['suma ['fn [(list ['x (symbol ":") 'i64] ['y (symbol ":") 'i64]) 'i64]] 2] ['main ['fn [() ()]] 8]]] 0 [['CAL 8] 'HLT ['POPARG 1] ['POPARG 0] ['PUSHFM 0] ['PUSHFM 1] 'ADD 'RET ['PUSHFI 5] ['PUSHFI 7] ['CAL 2]] [[2 ['i64 nil] ['i64 nil]] [8]]] 1)))
   )  
 )
+
+(deftest convertir-formato-impresion-test
+  (testing "Prueba de la funcion: convertir-formato-impresion"
+    (is (= '("Hola, mundo!") (convertir-formato-impresion '("Hola, mundo!"))))
+    (is (= '("Hola, mundo!, me llamo {%s}" "Nico") (convertir-formato-impresion '("Hola, mundo!, me llamo {{{}}}" "Nico" ))))
+    (is (= '("- My name is %s, James %s.\n- Hello, %d%d%d!" "Bond" "Bond" 0 0 7) (convertir-formato-impresion '("- My name is {}, James {}.\n- Hello, {}{}{}!" "Bond" "Bond" 0 0 7))))
+    (is (= '("%.0f elevado a la %d es\t%.0f" 2.0 2 4.0) (convertir-formato-impresion '("{} elevado a la {} es\t{}" 2.0 2 4.0))))
+    (is (= '("Las raices cuadradas de %.0f son +%.8f y -%.8f" 4.0 1.999999999985448 1.999999999985448) (convertir-formato-impresion '("Las raices cuadradas de {} son +{:.8} y -{:.8}" 4.0 1.999999999985448 1.999999999985448))))
+    (is (= '("Las raices cuadradas de %.0f son +%.32f y -%.32f" 4.0 1.999999999985448 1.999999999985448) (convertir-formato-impresion '("Las raices cuadradas de {} son +{:.32} y -{:.32}" 4.0 1.999999999985448 1.999999999985448))))
+  )  
+)
+
+(deftest dividir-test
+  (testing "Prueba de la funcion: dividir"
+    (is (= 4 (dividir 12 3)))  
+    (is (= 4.0 (dividir 12.0 3)))
+    (is (= 4.0 (dividir 12 3.0)))
+    (is (= 4.0 (dividir 12.0 3.0)))
+    (is (= 0 (dividir 1 2)))
+    (is (= 0.5 (dividir 1 2.0)))
+  )  
+)

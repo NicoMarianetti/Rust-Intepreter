@@ -2209,7 +2209,7 @@
         parsed-string []
         index-argument 0]
     (conj (rest args-print) (_convertir-formato-impresion original-string current-char parsed-string index-argument (rest args-print)))))
-  
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; DIVIDIR: Recibe dos numeros y devuelve su cociente, manteniendo su tipo.
 ; Por ejemplo:
@@ -2226,10 +2226,10 @@
 ; user=> (dividir 1 2.0)
 ; 0.5
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn dividir
-
-)
-
+(defn dividir [n1 n2]
+  (cond
+    (or (float? n1) (float? n2)) (float (/ n1 n2))
+    :else (quot n1 n2)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; COMPATIBLES?: Recibe dos elementos. Si el primero es un tipo de dato de Rust y el segundo es un valor de Clojure
 ; de un tipo de dato compatible con el mismo o un vector, devuelve true. Si no, false.
