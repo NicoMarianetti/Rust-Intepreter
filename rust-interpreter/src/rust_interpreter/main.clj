@@ -2348,7 +2348,11 @@
 ; [[[String "2"] [i64 6] [i64 2] [f64 3] [i64 0]] [[i64 6] [i64 2] [i64 [0 3]] [i64 [0 4]] [i64 2] [i64 2]]]
 ;                                 ^^^ ^
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn cargar-en-reg-dest
+(defn cargar-en-reg-dest [registros coordenadas tipo valor]
+  (let [vector (nth registros (first coordenadas))]
+    (assoc registros (first coordenadas) (assoc vector (second coordenadas) [tipo valor]))
+  )  
+)
 
 )
 
