@@ -2190,10 +2190,13 @@
   (let [number (first inst), intruction (second inst)]
     (str number " " intruction)))
 
-(defn dump [instrucciones]
+(defn _dump [instrucciones]
   (cond
-    (nil? instrucciones) (println "0 nil")
-    :else (first (map #(println (toStringFormatDump %)) (map-indexed list instrucciones)))))
+    (nil? instrucciones) ["0 nil"]
+    :else (vec (map toStringFormatDump (map-indexed list instrucciones)))))
+
+(defn dump [instrucciones]
+    (first (map println (_dump instrucciones))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; YA-DECLARADO-LOCALMENTE?: Recibe un identificador y un contexto (un vector formado por dos subvectores: el primero
