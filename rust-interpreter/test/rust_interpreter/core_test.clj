@@ -17,16 +17,16 @@
     (is (= false (es-el-doble? 4 7)))))
 
 
-;; (deftest listar-test
+(deftest listar-test
 
-;;   (testing "Prueba de la funcion: listar"
+  (testing "Prueba de la funcion: listar"
 
-;;     (is (= 
-;;       "fn main ( )
-;;       {
-;;         println! ( \"Hola, mundo!\" )
-;;       }" 
-;;       (listar (list 'fn 'main (symbol "(") (symbol ")") (symbol "{") 'println! (symbol "(") "Hola, mundo!" (symbol ")") (symbol "}")))))))
+    (is (= 
+      "fn main ( ) \n{\n  println! ( \"Hola, mundo!\" ) \n}\n" 
+      (listar (list 'fn 'main (symbol "(") (symbol ")") (symbol "{") 'println! (symbol "(") "Hola, mundo!" (symbol ")") (symbol "}")))))
+    (is (=
+      "fn main ( ) \n{\n  println! ( \"Hola, mundo!\" );\n  if ( true ) \n  {\n    println! ( true ) \n  }\n\n}\n"
+      (listar (list 'fn 'main (symbol "(") (symbol ")") (symbol "{") 'println! (symbol "(") "Hola, mundo!" (symbol ")") (symbol ";") 'if (symbol "(") 'true (symbol ")") (symbol "{") 'println! (symbol "(") "true" (symbol ")") (symbol "}") (symbol "}")))))))
 
 ;; (deftest agregar-ptocoma-test
 ;;   (testing "Prueba de la funcion: agregar-ptocoma"

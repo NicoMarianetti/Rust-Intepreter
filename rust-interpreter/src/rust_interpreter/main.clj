@@ -1902,9 +1902,37 @@
 ; }
 ; 
 ; nil
+; user=> 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn listar
+(defn _listar [tokens token-actual linea tabs]
+  (cond
+    (= (count tokens) token-actual) (println "")
+    :else (let [token (nth tokens token-actual)]
+            (cond
+              (= token (symbol "{")) (do 
+                (print (apply str (repeat tabs "  ")))
+                (println (apply str linea)) 
+                (print (apply str (repeat tabs "  "))) 
+                (println token) 
+                (recur tokens (inc token-actual) (empty linea) (inc tabs)))
+              (= token (symbol "}")) (do
+                (print (apply str (repeat tabs "  ")))
+                (println (apply str linea))
+                (print (apply str (repeat (dec tabs) "  ")))
+                (println token) 
+                (recur tokens (inc token-actual) (empty linea) (dec tabs)))
+              (= token (symbol ";")) (do
+                (print (apply str (repeat tabs "  ")))
+                (print (apply str (butlast linea)))
+                (println token)
+                (recur tokens (inc token-actual) (empty linea) tabs))
+              :else (recur tokens (inc token-actual) (conj linea token " ") tabs)))))
 
+(defn listar [tokens]
+  (let [token-actual 0,
+        linea [],
+        tabs 0]
+    (_listar tokens token-actual linea tabs))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1914,8 +1942,8 @@
 ; user=> (agregar-ptocoma (list 'fn 'main (symbol "(") (symbol ")") (symbol "{") 'if 'x '< '0 (symbol "{") 'x '= '- 'x (symbol ";") (symbol "}") 'renglon '= 'x (symbol ";") 'if 'z '< '0 (symbol "{") 'z '= '- 'z (symbol ";") (symbol "}") (symbol "}") 'fn 'foo (symbol "(") (symbol ")") (symbol "{") 'if 'y '> '0 (symbol "{") 'y '= '- 'y (symbol ";") (symbol "}") 'else (symbol "{") 'x '= '- 'y (symbol ";") (symbol "}") (symbol "}")))
 ; (fn main ( ) { if x < 0 { x = - x ; } ; renglon = x ; if z < 0 { z = - z ; } } fn foo ( ) { if y > 0 { y = - y ; } else { x = - y ; } })
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn agregar-ptocoma
-
+(defn agregar-ptocoma [tokens]
+  tokens
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2184,7 +2212,7 @@
     (= (dec (count original-string)) current-char) (apply str (conj parsed-string (nth original-string current-char)))
     :else (let [char (nth original-string current-char),
                 next-char (nth original-string (inc current-char))]
-            (cond ; ToDo: Give error if a } char is reached, the previous one wasn't a {} and the next one isn't }
+            (cond ; ToDo: Give error if a } char is reached, the previous one wasn't a { and the next one isn't }
               (and (= char \{) (= next-char \}))
               (let [format (cond
                              (integer? (nth args index-argument)) "%d"
