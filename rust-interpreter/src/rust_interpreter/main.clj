@@ -2050,36 +2050,25 @@
 ; nil
 ; user=> 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn _listar [tokens token-actual linea tabs]
+(defn _listar [tokens token-actual lineas linea-temp tabs]
   (cond
-    (= (count tokens) token-actual) (println "")
+    (= (count tokens) token-actual) (apply str (flatten lineas))
     :else (let [token (nth tokens token-actual)]
             (cond
-              (= token (symbol "{")) (do 
-                (print (apply str (repeat tabs "  ")))
-                (println (apply str linea)) 
-                (print (apply str (repeat tabs "  "))) 
-                (println token) 
-                (recur tokens (inc token-actual) (empty linea) (inc tabs)))
-              (= token (symbol "}")) (do
-                (if (not (empty? linea)) (do
-                  (print (apply str (repeat tabs "  ")))
-                  (println (apply str linea))))
-                (print (apply str (repeat (dec tabs) "  ")))
-                (println token) 
-                (recur tokens (inc token-actual) (empty linea) (dec tabs)))
-              (= token (symbol ";")) (do
-                (print (apply str (repeat tabs "  ")))
-                (print (apply str (butlast linea)))
-                (println token)
-                (recur tokens (inc token-actual) (empty linea) tabs))
-              :else (recur tokens (inc token-actual) (conj linea token " ") tabs)))))
+              (= token (symbol "{")) 
+                (recur tokens (inc token-actual) (apply conj lineas (repeat tabs "  ") linea-temp "\n" (repeat tabs "  ") token "\n") (empty linea-temp) (inc tabs))
+              (= token (symbol "}")) (let [linea (if (not (empty? linea-temp)) (apply conj [] (repeat tabs "  ") (conj linea-temp "\n")) [])]
+                (recur tokens (inc token-actual) (apply conj lineas linea (repeat (dec tabs) "  ") token "\n" ) (empty linea-temp) (dec tabs)))
+              (= token (symbol ";"))
+                (recur tokens (inc token-actual) (apply conj lineas (repeat tabs "  ") (butlast linea-temp) token "\n") (empty linea-temp) tabs)
+              :else (recur tokens (inc token-actual) lineas (conj linea-temp token " ") tabs)))))
 
 (defn listar [tokens]
   (let [token-actual 0,
-        linea [],
+        lineas [],
+        linea-temp [],
         tabs 0]
-    (_listar tokens token-actual linea tabs))
+    (println (_listar tokens token-actual lineas linea-temp tabs)))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
