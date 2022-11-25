@@ -22,10 +22,10 @@
   (testing "Prueba de la funcion: listar"
 
     (is (= 
-      "fn main ( ) \n{\n  println! ( \"Hola, mundo!\" ) \n}\n" 
+      "fn main ( ) \n{\n  println! ( \"Hola, mundo!\" ) \n}\nnil" 
       (listar (list 'fn 'main (symbol "(") (symbol ")") (symbol "{") 'println! (symbol "(") "Hola, mundo!" (symbol ")") (symbol "}")))))
     (is (=
-      "fn main ( ) \n{\n  println! ( \"Hola, mundo!\" );\n  if ( true ) \n  {\n    println! ( true ) \n  }\n\n}\n"
+      "fn main ( ) \n{\n  println! ( \"Hola, mundo!\" );\n  if ( true ) \n  {\n    println! ( true ) \n  }\n\n}\nnil"
       (listar (list 'fn 'main (symbol "(") (symbol ")") (symbol "{") 'println! (symbol "(") "Hola, mundo!" (symbol ")") (symbol ";") 'if (symbol "(") 'true (symbol ")") (symbol "{") 'println! (symbol "(") "true" (symbol ")") (symbol "}") (symbol "}")))))))
 
 ;; (deftest agregar-ptocoma-test
