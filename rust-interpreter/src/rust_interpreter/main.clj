@@ -1916,8 +1916,9 @@
                 (println token) 
                 (recur tokens (inc token-actual) (empty linea) (inc tabs)))
               (= token (symbol "}")) (do
-                (print (apply str (repeat tabs "  ")))
-                (println (apply str linea))
+                (if (not (empty? linea)) (do
+                  (print (apply str (repeat tabs "  ")))
+                  (println (apply str linea))))
                 (print (apply str (repeat (dec tabs) "  ")))
                 (println token) 
                 (recur tokens (inc token-actual) (empty linea) (dec tabs)))
@@ -1942,9 +1943,22 @@
 ; user=> (agregar-ptocoma (list 'fn 'main (symbol "(") (symbol ")") (symbol "{") 'if 'x '< '0 (symbol "{") 'x '= '- 'x (symbol ";") (symbol "}") 'renglon '= 'x (symbol ";") 'if 'z '< '0 (symbol "{") 'z '= '- 'z (symbol ";") (symbol "}") (symbol "}") 'fn 'foo (symbol "(") (symbol ")") (symbol "{") 'if 'y '> '0 (symbol "{") 'y '= '- 'y (symbol ";") (symbol "}") 'else (symbol "{") 'x '= '- 'y (symbol ";") (symbol "}") (symbol "}")))
 ; (fn main ( ) { if x < 0 { x = - x ; } ; renglon = x ; if z < 0 { z = - z ; } } fn foo ( ) { if y > 0 { y = - y ; } else { x = - y ; } })
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn _agregar-ptocoma [tokens token-actual tokens-ptocoma level]
+  (cond
+    (= (count tokens) token-actual) tokens-ptocoma
+    :else (let [token (nth tokens token-actual)]
+            (cond
+              (= token (symbol "{")) (recur tokens (inc token-actual) (conj tokens-ptocoma token) (inc level))
+              (= token (symbol "}")) (if (and (> level 1) (not= (nth tokens (inc token-actual)) 'else) (not= (nth tokens (inc token-actual)) (symbol "}")))
+                                        (recur tokens (inc token-actual) (conj tokens-ptocoma token (symbol ";")) (dec level)) 
+                                        (recur tokens (inc token-actual) (conj tokens-ptocoma token) (dec level)))
+              :else (recur tokens (inc token-actual) (conj tokens-ptocoma token) level)))))  
+
 (defn agregar-ptocoma [tokens]
-  tokens
-)
+  (let [token-actual 0,
+        level 0,
+        tokens-ptocoma ()]
+    (reverse  (_agregar-ptocoma tokens token-actual tokens-ptocoma level))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; PALABRA-RESERVADA?: Recibe un elemento y devuelve true si es una palabra reservada de Rust; si no, false.
