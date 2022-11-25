@@ -1,3 +1,8 @@
+(ns rust-interpreter.main
+
+  (:gen-class))
+
+
 (declare driver-loop)
 (declare escanear-arch)
 (declare listar)
@@ -125,12 +130,6 @@
 (declare generar-print!)
 (declare generar-format!)
 (declare interpretar)
-
-(defn spy
-
-  ([x] (do (prn x) x))
-
-  ([msg x] (do (print msg) (print ": ") (prn x) x)))
 
 (defn driver-loop
    ([]
@@ -1959,14 +1958,16 @@
           ; CHR: Incrementa cont-prg en 1, quita de la pila dos elementos (un string y un indice), selecciona el char del string indicado por el indice y lo coloca al final de la pila.
           CHR (let [[string indice] (take-last 2 pila),
                     char (nth string indice)]
-              (recur cod regs-de-act (inc cont-prg) (conj (vec (drop-last 2 pila))) char) mapa-regs))
+              (recur cod regs-de-act (inc cont-prg) (conj (vec (drop-last 2 pila)) char) mapa-regs))
 
           ; OR: Como ADD, pero calcula el or entre los dos valores.
-          OR (let [res (aplicar-operador-diadico or pila)]
+          OR (let [res (try (vec (conj (vec (drop-last 2 pila)) (or (last (butlast pila)) (last pila))))
+                        (catch Exception e (print "ERROR: ") (println (buscar-mensaje 56)) nil))]
                 (if (nil? res) res (recur cod regs-de-act (inc cont-prg) res mapa-regs)))
 
           ; AND: Como ADD, pero calcula el and entre los dos valores.
-          AND (let [res (aplicar-operador-diadico and pila)]
+          AND (let [res (try (vec (conj (vec (drop-last 2 pila)) (and (last (butlast pila)) (last pila))))
+                        (catch Exception e (print "ERROR: ") (println (buscar-mensaje 56)) nil))]
                 (if (nil? res) res (recur cod regs-de-act (inc cont-prg) res mapa-regs)))
 
           ; EQ: Como ADD, pero calcula la operacion relacional = entre los dos valores.
@@ -2010,19 +2011,23 @@
                 (if (nil? res) res (recur cod regs-de-act (inc cont-prg) res mapa-regs)))
 
           ; SQRT: Incrementa cont-prg en 1, quita de la pila un elemento numerico, calcula su raiz cuadrada y la coloca al final de la pila.
-          SQRT (let [res (aplicar-operador-monadico Math/sqrt pila)]
+          SQRT (let [res (try (vec (conj (vec (butlast pila)) (Math/sqrt (last pila))))
+                        (catch Exception e (print "ERROR: ") (println (buscar-mensaje 55)) nil))]
                 (if (nil? res) res (recur cod regs-de-act (inc cont-prg) res mapa-regs)))
 
           ; SIN: Incrementa cont-prg en 1, quita de la pila un elemento numerico, calcula su seno y lo coloca al final de la pila.
-          SIN (let [res (aplicar-operador-monadico Math/sin pila)]
+          SIN (let [res (try (vec (conj (vec (butlast pila)) (Math/sin (last pila))))
+                        (catch Exception e (print "ERROR: ") (println (buscar-mensaje 55)) nil))]
                 (if (nil? res) res (recur cod regs-de-act (inc cont-prg) res mapa-regs)))
 
           ; ATAN: Incrementa cont-prg en 1, quita de la pila un elemento numerico, calcula su arcotangente y la coloca al final de la pila.
-          ATAN (let [res (aplicar-operador-monadico Math/atan pila)]
+          ATAN (let [res (try (vec (conj (vec (butlast pila)) (Math/atan (last pila))))
+                         (catch Exception e (print "ERROR: ") (println (buscar-mensaje 55)) nil))]
                 (if (nil? res) res (recur cod regs-de-act (inc cont-prg) res mapa-regs)))
 
           ; ABS: Incrementa cont-prg en 1, quita de la pila un elemento numerico, calcula su valor absoluto y lo coloca al final de la pila.
-          ABS (let [res (aplicar-operador-monadico Math/abs pila)]
+          ABS (let [res (try (vec (conj (vec (butlast pila)) (Math/abs (last pila))))
+                        (catch Exception e (print "ERROR: ") (println (buscar-mensaje 55)) nil))]
                 (if (nil? res) res (recur cod regs-de-act (inc cont-prg) res mapa-regs)))
 
        )
@@ -2535,8 +2540,6 @@
   (let [vector (nth registros (first coordenadas))]
     (assoc registros (first coordenadas) (assoc vector (second coordenadas) [tipo valor]))
   )  
-)
-
 )
 
 true
