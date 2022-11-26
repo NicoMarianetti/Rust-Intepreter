@@ -23,12 +23,6 @@
 
     (do (print "Presione Enter...") (flush) (read-line) (read-line) 'Chau!)))
 
-(defn spy
-
-  ([x] (do (prn x) x))
-
-  ([msg x] (do (print msg) (print ": ") (prn x) x)))
-
 (defn -main
 
   "Ejemplo de Proyecto en Clojure"

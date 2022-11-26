@@ -131,6 +131,12 @@
 (declare generar-format!)
 (declare interpretar)
 
+(defn spy
+
+  ([x] (do (prn x) x))
+
+  ([msg x] (do (print msg) (print ": ") (prn x) x)))
+
 (defn driver-loop
    ([]
       (prn)
@@ -2084,7 +2090,7 @@
     :else (let [token (nth tokens token-actual)]
             (cond
               (= token (symbol "{")) (recur tokens (inc token-actual) (conj tokens-ptocoma token) (inc level))
-              (= token (symbol "}")) (if (and (> level 1) (not= (nth tokens (inc token-actual)) 'else) (not= (nth tokens (inc token-actual)) (symbol "}")))
+              (= token (symbol "}")) (if (and (> level 1) (not= (nth tokens (inc token-actual)) 'else) (not= (nth tokens (inc token-actual)) (symbol ")")) (not= (nth tokens (inc token-actual)) (symbol "}")))
                                         (recur tokens (inc token-actual) (conj tokens-ptocoma token (symbol ";")) (dec level)) 
                                         (recur tokens (inc token-actual) (conj tokens-ptocoma token) (dec level)))
               :else (recur tokens (inc token-actual) (conj tokens-ptocoma token) level)))))  
@@ -2196,7 +2202,7 @@
     :else (vec (map toStringFormatDump (map-indexed list instrucciones)))))
 
 (defn dump [instrucciones]
-    (first (map println (_dump instrucciones))))
+      (println (reduce #(str %1 "\n" %2) (_dump instrucciones)) ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; YA-DECLARADO-LOCALMENTE?: Recibe un identificador y un contexto (un vector formado por dos subvectores: el primero
