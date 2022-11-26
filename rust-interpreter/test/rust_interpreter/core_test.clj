@@ -255,4 +255,303 @@
   (testing "Prueba del opcode: HLT"
     (is (nil? (interpretar ['HLT] [] 0 [] [])))
   )  
+
+  (testing "Prueba del opcode: PUSHREF"
+    (is (=
+        [[['PUSHREF 3] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 23]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]]] 1 [23] []]
+        (pushref [['PUSHREF 3] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 23]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]]] 0 [] [] ['PUSHREF 3] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]])))
+  )
+
+  (testing "Prueba del opcode: PUSHADDR"
+    (is (= 
+      [[['PUSHADDR 3] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 0]]] 1 [[0 3]] []]
+      (pushaddr [['PUSHADDR 3] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 0]]] 0 [] [] ['PUSHADDR 3])))  
+  )
+
+  (testing "Prueba del opcode: POP"
+    (is (= 
+      [[['POP 4] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 23]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 nil]]] 1 [1 150] []]
+      (_pop [['POP 4] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 23]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]]] 0 [1 150 5] [] ['POP 4] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]])))  
+    (is (=
+      [['POP 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 23]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]]] 1 [1 150] []]
+      (_pop ['POP 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 23]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]]] 0 [1 150 5] [] 'POP [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]])))
+  )
+
+  (testing "Prueba del opcode: POPARG"
+    (is (=
+      [[['POPARG 3] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 0]] [['i64 nil] ['i64 nil] ['i64 nil] ['i64 [0 4]] ['i64 nil] ['i64 nil]]] 1 [1 23 5 [0 3] 150] []]
+      (poparg [['POPARG 3] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 0]] [['i64 nil] ['i64 nil] ['i64 nil] ['i64 nil] ['i64 nil] ['i64 nil]]] 0 [1 23 5 [0 3] [0 4] 150] [] ['POPARG 3] [['i64 nil] ['i64 nil] ['i64 nil] ['i64 nil] ['i64 nil] ['i64 nil]])))  
+  )
+
+  (testing "Prueba del opcode: POPREF"
+    (is (=
+      [[['POPREF 3] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 23]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]]] 1 [1 150] []]
+      (popref [['POPREF 3] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 0]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]]] 0 [1 150 23] [] ['POPREF 3] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 nil] ['i64 nil]])))  
+  )
+
+  (testing "Prueba del opcode: FMT"
+    (is (=
+      [['FMT 'HLT] [] 1 [1 153 "Resto: 9"] []]
+      (fmt ['FMT 'HLT] [] 0 [1 153 "Resto: {}" 9 2] [])))
+  )
+
+  (testing "Prueba del opcode: OUT"
+    (is (=
+      [['OUT 'HLT] [] 1 [1 153] []]
+      (out ['OUT 'HLT] [] 0 [1 153 "Resto: {}" 9 2] [])))  
+  )
+
+  (testing "Prueba del opcode: RET"
+    (is (=
+      [['RET 'HLT] [[['String "15"] ['i64 12] ['i64 15]]] 81 [1 "{} es el MCD entre " 3] []]
+      (ret ['RET 'HLT] [[['String "15"] ['i64 12] ['i64 15]] [['i64 3] ['i64 3]]] 40 [1 "{} es el MCD entre " 81 3] [])))  
+  )
+
+  (testing "Prueba del opcode: POPADD"
+    (is (=
+      [[['POPADD 2] 'HLT] [[['String "6"] ['i64 6] ['i64 7]]] 1 [1] []]
+      (popadd [['POPADD 2] 'HLT] [[['String "6"] ['i64 6] ['i64 5]]] 0 [1 2] [] ['POPADD 2] [['String "6"] ['i64 6] ['i64 5]]))
+    )
+  )
+
+  (testing "Prueba del opcode: POPADDREF"
+    (is (=
+      [[['POPADDREF 2] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 1] ['i64 3]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]]] 1 [1 150] []]
+      (popaddref [['POPADDREF 2] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 0] ['i64 3]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]]] 0 [1 150 1] [] ['POPADDREF 2] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]])))  
+  )
+
+  (testing "Prueba del opcode: ADD"
+    (is (=
+      [['ADD 'HLT] [] 1 [1 0 0 7] []]
+      (add ['ADD 'HLT] [] 0 [1 0 0 3 4] [])))
+  )
+
+  (testing "Prueba del opcode: PUSHFI"
+    (is (=
+      [[['PUSHFI 3] 'HLT] [] 1 [1 0 0 3 4 3] []]
+      (pushfi [['PUSHFI 3] 'HLT] [] 0 [1 0 0 3 4] [] ['PUSHFI 3])))
+  )  
+    
+  (testing "Prueba del opcode: PUSHFM"
+    (is (=
+      [[['PUSHFM 2] 'HLT] [[['String "6"] ['i64 6] ['i64 5]]] 1 [5] []]
+      (pushfm [['PUSHFM 2] 'HLT] [[['String "6"] ['i64 6] ['i64 5]]] 0 [] [] ['PUSHFM 2] [['String "6"] ['i64 6] ['i64 5]])))  
+  )
+
+  (testing "Prueba del opcode: JMP"
+    (is (=
+      [[['JMP 3] 'HLT] [] 3 [] []]
+      (jmp [['JMP 3] 'HLT] [] 0 [] [] ['JMP 3]))) 
+  )
+
+  (testing "Prueba del opcode: JC"
+    (is (=
+      [[['JC 3] 'HLT] [] 1 [] []]
+      (jc [['JC 3] 'HLT] [] 0 [5] [] ['JC 3])))
+    (is (=
+      [[['JC 3] 'HLT] [] 3 [] []]
+      (jc [['JC 3] 'HLT] [] 0 [true] [] ['JC 3])))
+  )
+
+  (testing "Prueba del opcode: CAL"
+    (is (=
+      [[['CAL 0] 'HLT] [[['String "1"] ['i64 6] ['i64 5]] [[['String "2"] ['i64 6] ['i64 5]]] [[['String "3"] ['i64 6] ['i64 5]]]] 0 [1] [[[['String "3"] ['i64 6] ['i64 5]]]]]
+      (cal [['CAL 0] 'HLT] [[['String "1"] ['i64 6] ['i64 5]] [[['String "2"] ['i64 6] ['i64 5]]]] 10 [] [[[['String "3"] ['i64 6] ['i64 5]]]] ['CAL 0])))  
+  )
+
+  (testing "Prueba del opcode: RETN"
+    (is (=
+      [[['CAL 0] 'HLT] [[['String "1"] ['i64 6] ['i64 5]]] 1 [] []]
+      (retn [['CAL 0] 'HLT] [[['String "1"] ['i64 6] ['i64 5]] [[['String "2"] ['i64 6] ['i64 5]]]] 0 [1] [])))  
+  )
+
+  (testing "Prueba del opcode: NL"
+    (is (=
+      [['NL 'HLT] [] 1 [] []]
+      (nl ['NL 'HLT] [] 0 [] [])))  
+  )
+
+  (testing "Prueba del opcode: FLUSH"
+    (is (=
+      [['FLUSH 'HLT] [] 1 [] []]
+      (_flush ['FLUSH 'HLT] [] 0 [] [])))
+  )
+
+  (testing "Prueba del opcode: POPSUB"
+    (is (=
+      [['POPSUB 'HLT] [[['String "6"] ['i64 6] ['i64 3]]] 1 [1] []]
+      (popsub ['POPSUB 'HLT] [[['String "6"] ['i64 6] ['i64 5]]] 0 [1 2] [] ['POPSUB 2] [['String "6"] ['i64 6] ['i64 5]]))
+    )
+  )
+
+  (testing "Prueba del opcode: POPMUL"
+    (is (=
+      [[['POPMUL 2] 'HLT] [[['String "6"] ['i64 6] ['i64 10]]] 1 [1] []]
+      (popmul [['POPMUL 2] 'HLT] [[['String "6"] ['i64 6] ['i64 5]]] 0 [1 2] [] ['POPMUL 2] [['String "6"] ['i64 6] ['i64 5]]))
+    )
+  )
+
+  (testing "Prueba del opcode: POPDIV"
+    (is (=
+      [[['POPDIV 2] 'HLT] [[['String "6"] ['i64 6] ['i64 3]]] 1 [1] []]
+      (popdiv [['POPDIV 2] 'HLT] [[['String "6"] ['i64 6] ['i64 9]]] 0 [1 3] [] ['POPDIV 2] [['String "6"] ['i64 6] ['i64 9]]))
+    )
+  )
+
+  (testing "Prueba del opcode: POPMOD"
+    (is (=
+      [[['POPMOD 2] 'HLT] [[['String "6"] ['i64 6] ['i64 1]]] 1 [1] []]
+      (popmod [['POPMOD 2] 'HLT] [[['String "6"] ['i64 6] ['i64 5]]] 0 [1 2] [] ['POPMOD 2] [['String "6"] ['i64 6] ['i64 5]]))
+    )
+  )
+
+  (testing "Prueba del opcode: POPSUBREF"
+    (is (=
+      [[['POPSUBREF 2] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 4] ['i64 3]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]]] 1 [1 150] []]
+      (popsubref [['POPSUBREF 2] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 5] ['i64 3]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]]] 0 [1 150 1] [] ['POPSUBREF 2] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]])))  
+  )
+
+  (testing "Prueba del opcode: POPMULREF"
+    (is (=
+      [[['POPMULREF 2] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 10] ['i64 3]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]]] 1 [1 150] []]
+      (popmulref [['POPMULREF 2] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 5] ['i64 3]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]]] 0 [1 150 2] [] ['POPMULREF 2] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]])))  
+  )
+
+  (testing "Prueba del opcode: POPDIVREF"
+    (is (=
+      [[['POPDIVREF 2] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 3] ['i64 3]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]]] 1 [1 150] []]
+      (popdivref [['POPDIVREF 2] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 9] ['i64 3]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]]] 0 [1 150 3] [] ['POPDIVREF 2] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]])))  
+  )
+
+  (testing "Prueba del opcode: POPMODREF"
+    (is (=
+      [[['POPMODREF 2] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 2] ['i64 3]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]]] 1 [1 150] []]
+      (popmodref [['POPMODREF 2] 'HLT] [[['String "5"] ['i64 23] ['i64 5] ['i64 8] ['i64 3]] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]]] 0 [1 150 3] [] ['POPMODREF 2] [['i64 23] ['i64 5] ['i64 [0 3]] ['i64 [0 4]] ['i64 5] ['i64 20]])))  
+  )
+
+  (testing "Prueba del opcode: SUB"
+    (is (=
+      [['SUB 'HLT] [] 1 [1 0 0 -1] []]
+      (sub ['SUB 'HLT] [] 0 [1 0 0 3 4] [])))
+  )
+
+  (testing "Prueba del opcode: MUL"
+    (is (=
+      [['MUL 'HLT] [] 1 [1 0 0 12] []]
+      (mul ['MUL 'HLT] [] 0 [1 0 0 3 4] [])))
+  )
+
+  (testing "Prueba del opcode: DIV"
+    (is (=
+      [['DIV 'HLT] [] 1 [1 0 0 2] []]
+      (div ['DIV 'HLT] [] 0 [1 0 0 6 3] [])))
+  )  
+
+  (testing "Prueba del opcode: MOD"
+    (is (=
+      [['MOD 'HLT] [] 1 [1 0 0 1] []]
+      (_mod ['MOD 'HLT] [] 0 [1 0 0 7 3] [])))
+  )
+
+  (testing "Prueba del opcode: CHR"
+    (is (=
+      [['CHR 'HLT] [] 1 [1 \a] []]
+      (chr ['CHR 'HLT] [] 0 [1 "Juan" 2] [])))  
+  )
+
+  (testing "Prueba del opcode: OR"
+    (is (=
+      [['OR 'HLT] [] 1 [1 0 0 true] []]
+      (_or ['OR 'HLT] [] 0 [1 0 0 false true] [])))
+  )
+
+  (testing "Prueba del opcode: AND"
+    (is (=
+      [['AND 'HLT] [] 1 [1 0 0 false] []]
+      (_and ['AND 'HLT] [] 0 [1 0 0 false true] [])))
+  )
+  
+  (testing "Prueba del opcode: EQ"
+    (is (=
+      [['EQ 'HLT] [] 1 [1 0 0 false] []]
+      (eq ['EQ 'HLT] [] 0 [1 0 0 4 8] [])))
+  )
+
+  (testing "Prueba del opcode: NEQ"
+    (is (=
+      [['NEQ 'HLT] [] 1 [1 0 0 true] []]
+      (neq ['NEQ 'HLT] [] 0 [1 0 0 4 8] [])))
+  )
+
+  (testing "Prueba del opcode: GT"
+    (is (=
+      [['GT 'HLT] [] 1 [1 0 0 false] []]
+      (gt ['GT 'HLT] [] 0 [1 0 0 4 8] [])))
+  )
+
+  (testing "Prueba del opcode: GTE"
+    (is (=
+      [['GTE 'HLT] [] 1 [1 0 0 true] []]
+      (gte ['GTE 'HLT] [] 0 [1 0 0 4 4] [])))
+  )
+
+  (testing "Prueba del opcode: LT"
+    (is (=
+      [['LT 'HLT] [] 1 [1 0 0 true] []]
+      (lt ['LT 'HLT] [] 0 [1 0 0 4 8] [])))
+  )
+
+  (testing "Prueba del opcode: LTE"
+    (is (=
+      [['LTE 'HLT] [] 1 [1 0 0 true] []]
+      (gte ['LTE 'HLT] [] 0 [1 0 0 4 4] [])))
+  )
+
+  (testing "Prueba del opcode: NEG"
+    (is (=
+      [['NEG 'HLT] [] 1 [1 0 0 -5] []]
+      (neg ['NEG 'HLT] [] 0 [1 0 0 5] [])))
+  )
+
+  (testing "Prueba del opcode: NOT"
+    (is (=
+      [['NOT 'HLT] [] 1 [1 0 0 false] []]
+      (_not ['NOT 'HLT] [] 0 [1 0 0 true] [])))
+  )
+
+  (testing "Prueba del opcode: TOI"
+    (is (=
+      [['TOI 'HLT] [] 1 [1 0 0 5] []]
+      (toi ['TOI 'HLT] [] 0 [1 0 0 "5"] []))) 
+  )
+
+  (testing "Prueba del opcode: TOF"
+    (is (=
+      [['TOS 'HLT] [] 1 [1 0 0 5.0] []]
+      (tof ['TOS 'HLT] [] 0 [1 0 0 5] []))) 
+  )
+
+  (testing "Prueba del opcode: SQRT"
+    (is (=
+      [['SQRT 'HLT] [] 1 [1 0 0 2.0] []]
+      (sqrt ['SQRT 'HLT] [] 0 [1 0 0 4] [])))
+  )
+
+  (testing "Prueba del opcode: SIN"
+    (is (=
+      [['SIN 'HLT] [] 1 [1 0 0 0.0] []]
+      (sin ['SIN 'HLT] [] 0 [1 0 0 0] [])))
+  )  
+
+  (testing "Prueba del opcode: ATAN"
+    (is (=
+      [['ATAN 'HLT] [] 1 [1 0 0 0.0] []]
+      (atan ['ATAN 'HLT] [] 0 [1 0 0 0] []))) 
+  )
+
+  (testing "Prueba del opcode: ABS"
+    (is (=
+      [['ABS 'HLT] [] 1 [1 0 0 5] []]
+      (_abs ['ABS 'HLT] [] 0 [1 0 0 -5] [])))
+  )  
 )
