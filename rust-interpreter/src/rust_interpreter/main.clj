@@ -1773,7 +1773,7 @@
 )
 
 (defn cal [cod regs-de-act cont-prg pila mapa-regs fetched]
-  [cod (conj regs-de-act (mapa-regs (second fetched))) (second fetched) (conj pila (inc (second fetched))) mapa-regs]
+  [cod (conj regs-de-act (mapa-regs (second fetched))) (second fetched) (conj pila (inc cont-prg)) mapa-regs]
 )
 
 (defn retn [cod regs-de-act cont-prg pila mapa-regs]
@@ -1985,6 +1985,7 @@
   (let [fetched (cod cont-prg),
         opcode (if (symbol? fetched) fetched (first fetched)),
         reg-actual (last regs-de-act)]
+      (do ()
        (case opcode
 
           ; Detiene la ejecucion (deja de llamar recursivamente a interpretar)
@@ -2367,7 +2368,7 @@
                 (recur code regs-de-act cont-prg pila mapa-regs))
 
           ; CHR: Incrementa cont-prg en 1, quita de la pila dos elementos (un string y un indice), selecciona el char del string indicado por el indice y lo coloca al final de la pila.
-          CHR (let [res (chr cod regs-de-act cont-prg pila mapa-regs fetched)
+          CHR (let [res (chr cod regs-de-act cont-prg pila mapa-regs)
                     code (res 0)
                     regs-de-act (res 1)
                     cont-prg (res 2)
@@ -2518,7 +2519,7 @@
                     pila (res 3)
                     mapa-regs (res 4)]
                 (recur code regs-de-act cont-prg pila mapa-regs))
-       )
+       ))
   )
 )
 
@@ -2841,6 +2842,10 @@
 ; user=> (convertir-formato-impresion '("Las raices cuadradas de {} son +{:.8} y -{:.8}" 4.0 1.999999999985448 1.999999999985448))
 ; ("Las raices cuadradas de %.0f son +%.8f y -%.8f" 4.0 1.999999999985448 1.999999999985448)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn get-float-precision-int [number]
+  (let [number-str (str number)]
+    (dec (count (drop-while #(= \0 %) (reverse (drop-while #(not= % \.) number-str)))))))
+
 (defn get-float-precision [string index result]
   (cond
     (= (nth string index) \}) result
@@ -2852,11 +2857,11 @@
     (= (dec (count original-string)) current-char) (apply str (conj parsed-string (nth original-string current-char)))
     :else (let [char (nth original-string current-char),
                 next-char (nth original-string (inc current-char))]
-            (cond ; ToDo: Give error if a } char is reached, the previous one wasn't a { and the next one isn't }
+            (cond 
               (and (= char \{) (= next-char \}))
               (let [format (cond
                              (integer? (nth args index-argument)) "%d"
-                             (float? (nth args index-argument)) "%.0f"
+                             (float? (nth args index-argument)) (str "%." (get-float-precision-int (nth args index-argument)) "f")
                              :else "%s")]
                 (recur original-string (inc (inc current-char)) (conj parsed-string format) (inc index-argument) args))
 
@@ -2896,6 +2901,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn dividir [n1 n2]
   (cond
+    (and (float? n1) (float? n2)) (/ n1 n2)
     (or (float? n1) (float? n2)) (float (/ n1 n2))
     :else (quot n1 n2)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

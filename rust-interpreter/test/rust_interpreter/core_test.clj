@@ -355,7 +355,7 @@
 
   (testing "Prueba del opcode: CAL"
     (is (=
-      [[['CAL 0] 'HLT] [[['String "1"] ['i64 6] ['i64 5]] [[['String "2"] ['i64 6] ['i64 5]]] [[['String "3"] ['i64 6] ['i64 5]]]] 0 [1] [[[['String "3"] ['i64 6] ['i64 5]]]]]
+      [[['CAL 0] 'HLT] [[['String "1"] ['i64 6] ['i64 5]] [[['String "2"] ['i64 6] ['i64 5]]] [[['String "3"] ['i64 6] ['i64 5]]]] 0 [11] [[[['String "3"] ['i64 6] ['i64 5]]]]]
       (cal [['CAL 0] 'HLT] [[['String "1"] ['i64 6] ['i64 5]] [[['String "2"] ['i64 6] ['i64 5]]]] 10 [] [[[['String "3"] ['i64 6] ['i64 5]]]] ['CAL 0])))  
   )
 
