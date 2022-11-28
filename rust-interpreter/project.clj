@@ -1,6 +1,6 @@
 (defproject rust-interpreter "0.1.0-SNAPSHOT"
 
-  :description "Rust Interpreter"
+  :description "Autor: Nicolás Marianetti"
 
   :url "http://example.com/FIXME"
 
